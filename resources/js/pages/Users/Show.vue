@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { saveCardDetailResult } from '@/services/AppService';
 import { Check } from '@lucide/vue';
@@ -34,6 +33,13 @@ const props = defineProps<{
                 match_date: string; 
                 team1: { name: string };
                 team2: { name: string };
+                group: { name: string } | null;
+                gol_1: number | null;
+                gol_2: number | null;
+                played: boolean;
+                penalties: boolean;
+                penalties_gol_1: number | null;
+                penalties_gol_2: number | null;
             };
             gol_1: number;
             gol_2: number;
@@ -62,9 +68,13 @@ type CardDetail = {
         team1: { name: string };
         team2: { name: string };
         group: { name: string } | null;
+        gol_1: number | null;
+        gol_2: number | null;
+        played: boolean;
     };
     gol_1: number;
     gol_2: number;
+    points: number;
     updated_by: number | null;
 };
 
@@ -96,6 +106,9 @@ function date_format(dateString: string) {
     return new Date(dateString).toLocaleDateString(undefined, options) + '  ' + new Date(dateString).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
 
+function date_hour_format(dateString: string) {
+    return new Date(dateString).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+}
 function saveResult(detail: CardDetail) {
     
     saveCardDetailResult(detail)
@@ -106,6 +119,19 @@ function saveResult(detail: CardDetail) {
         .catch((error) => {
             console.error('Error al guardar el resultado:', error);
         });
+}
+
+function resultadoText(detail: CardDetail): string {
+    if (detail.fixture.gol_1 === null || detail.fixture.gol_2 === null) {
+        return '';
+    }
+    if (detail.fixture.gol_1 > detail.fixture.gol_2) {
+        return detail.fixture.gol_1 + ' - ' + detail.fixture.gol_2 + ' Ganó ' + detail.fixture.team1.name  ;
+    } else if (detail.fixture.gol_1 < detail.fixture.gol_2) {
+        return detail.fixture.gol_1 + ' - ' + detail.fixture.gol_2 + ' Ganó ' + detail.fixture.team2.name;
+    } else {
+        return detail.fixture.gol_1 + ' - ' + detail.fixture.gol_2 + ' Empate';
+    }
 }
 </script>
 
@@ -223,12 +249,12 @@ function saveResult(detail: CardDetail) {
 
                                 <div class="mt-5 grid grid-cols-2 gap-3">
                                     <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
-                                        <p class="text-[11px] uppercase tracking-[0.25em] text-slate-400">ID</p>
-                                        <p class="mt-1 text-lg font-bold text-white">{{ card.id }}</p>
+                                        <p class="text-[11px] uppercase tracking-[0.25em] text-slate-400">Posicion</p>
+                                        <p class="mt-1 text-lg font-bold text-white">Entre los primeros 10 jugadores</p>
                                     </div>
                                     <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
-                                        <p class="text-[11px] uppercase tracking-[0.25em] text-slate-400">Detalle</p>
-                                        <p class="mt-1 text-lg font-bold text-white">{{ card.card_details.length }}</p>
+                                        <p class="text-[11px] uppercase tracking-[0.25em] text-slate-400">Puntuacion</p>
+                                        <p class="mt-1 text-lg text-center font-bold text-white">{{ card.total_points }}</p>
                                     </div>
                                 </div>
 
@@ -277,8 +303,23 @@ function saveResult(detail: CardDetail) {
                                                                 </span>
                                                                 <span class="truncate text-left">{{ detail.fixture.team2.name }}</span>
                                                             </div>
-                                                            <p class="mt-1 text-xs uppercase tracking-[0.28em] text-slate-400">#{{ date_format(detail.fixture.match_date) }}</p>
-                                                            <p> {{ detail.fixture.group?.name }}</p>
+                                                            <p class="mt-1 text-xs uppercase tracking-[0.28em] text-slate-400">
+                                                                #{{ date_hour_format(detail.fixture.match_date) }}, 
+                                                                {{ resultadoText(detail) }}
+                                                            </p>
+                                                            <p class="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-300">
+                                                                <span>{{ detail.fixture.group?.name }}</span>
+                                                                <span
+                                                                    class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold ring-1"
+                                                                    :class="{
+                                                                        'bg-emerald-400/15 text-emerald-300 ring-emerald-400/30': detail.points === 3,
+                                                                        'bg-amber-400/15 text-amber-300 ring-amber-400/30': detail.points === 1,
+                                                                        'bg-slate-400/10 text-slate-500 ring-slate-400/20': detail.points === 0,
+                                                                    }"
+                                                                >
+                                                                    {{ detail.points }} pts
+                                                                </span>
+                                                            </p>
                                                         </div>
 
                                                         <div class="flex items-left gap-0">
@@ -299,6 +340,89 @@ function saveResult(detail: CardDetail) {
                                         </div>
                                     </div>
                                 </div>
+                            </article>
+                            <article
+                              
+                                class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-5 shadow-2xl ring-1 ring-white/5"
+                            >
+                                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-sky-500 to-fuchsia-500"></div>
+
+                               <!-- Reglas -->
+<section class="space-y-4">
+    <header>
+        <span class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Reglas</span>
+        <h3 class="mt-2 text-2xl font-black text-white">¡Reglas del juego!</h3>
+    </header>
+
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <h4 class="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400">Cómo ganar puntos</h4>
+        <ul class="mt-3 space-y-2">
+            <li class="flex gap-2 text-sm text-slate-300">
+                <span class="font-bold text-emerald-400">3 puntos</span>
+                por acertar el resultado exacto del partido.
+            </li>
+            <li class="flex gap-2 text-sm text-slate-300">
+                <span class="font-bold text-emerald-400">1 punto</span>
+                por acertar el resultado sin acertar el marcador exacto (ganador o empate).
+            </li>
+            <li class="flex gap-2 text-sm text-slate-300">
+                <span class="font-bold text-red-400">0 puntos</span>
+                por no acertar el resultado del partido.
+            </li>
+            <li class="mt-3 text-sm text-amber-300/80">
+                ⚠️ Llena los goles de cada partido hasta 10 minutos antes de iniciar para sumar puntos.
+            </li>
+        </ul>
+    </div>
+</section>
+
+<!-- Premios -->
+<section class="space-y-4">
+    <header>
+        <span class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Premios</span>
+        <h3 class="mt-2 text-2xl font-black text-white">¡Premios!</h3>
+    </header>
+
+    <div class="grid grid-cols-3 gap-3">
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
+            <span class="inline-block rounded-full bg-amber-400/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                🥇 1er lugar
+            </span>
+            <p class="mt-2 text-lg font-bold text-white">60%</p>
+            <p class="text-xs text-slate-400">del total</p>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
+            <span class="inline-block rounded-full bg-slate-400/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300">
+                🥈 2do lugar
+            </span>
+            <p class="mt-2 text-lg font-bold text-white">30%</p>
+            <p class="text-xs text-slate-400">del total</p>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
+            <span class="inline-block rounded-full bg-orange-400/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-orange-400">
+                🥉 3er lugar
+            </span>
+            <p class="mt-2 text-lg font-bold text-white">10%</p>
+            <p class="text-xs text-slate-400">del total</p>
+        </div>
+    </div>
+</section>
+
+<!-- Pozo Acumulado -->
+<section class="space-y-4">
+    <header>
+        <span class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Pozo</span>
+        <h3 class="mt-2 text-2xl font-black text-white">Pozo acumulado</h3>
+    </header>
+
+    <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-emerald-500/10 p-5 text-center">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.25em] text-emerald-400">Total acumulado</p>
+        <p class="mt-2 text-4xl font-black text-white">Bs. 30,000</p>
+    </div>
+</section>
+                              
+
+                              
                             </article>
                         </div>
                     </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, CreditCard, FolderGit2, LayoutGrid, Users } from '@lucide/vue';
+import { BookOpen, CreditCard, FolderGit2, LayoutGrid, Users, Play } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -14,13 +14,22 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+// import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
+
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const page = usePage();
+const user = computed(() => page.props.auth.user);
+
+
+const isAdmin = user.value.is_admin || false;
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard(),
+        href: '/dashboard',
         icon: LayoutGrid,
         
     },
@@ -35,6 +44,12 @@ const mainNavItems: NavItem[] = [
         href: '/cards',
         icon: CreditCard,
     },
+    {
+        title: 'Partidos',
+        href: '/fixtures',
+        icon: Play,
+    },
+    
 ];
 
 const footerNavItems: NavItem[] = [
@@ -54,12 +69,12 @@ const footerNavItems: NavItem[] = [
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="inset">
+    <Sidebar collapsible="icon" variant="inset" v-if="isAdmin" >
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <Link href="/dashboard">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>
@@ -71,10 +86,10 @@ const footerNavItems: NavItem[] = [
             <NavMain :items="mainNavItems" />
         </SidebarContent>
 
-        <SidebarFooter>
+        <!-- <SidebarFooter>
             <NavFooter :items="footerNavItems" />
             <NavUser />
-        </SidebarFooter>
+        </SidebarFooter> -->
     </Sidebar>
     <slot />
 </template>

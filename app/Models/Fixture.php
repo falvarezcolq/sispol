@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Fixture extends Model
 {
-    //
+    use SoftDeletes;
 
     protected $fillable = [
         'country_id_1',
@@ -23,15 +24,11 @@ class Fixture extends Model
         'penalties_gol_1',
         'penalties_gol_2',
     ];
+
     public function cardDetails()
     {
         return $this->hasMany(CardDetail::class);
     }
-
-    // public function getTeamNamesAttribute()
-    // {
-    //     return $this->team1 . ' vs ' . $this->team2;
-    // }
 
     public function team1()
     {
@@ -47,5 +44,4 @@ class Fixture extends Model
     {
         return $this->belongsTo(Group::class);
     }
-    
 }

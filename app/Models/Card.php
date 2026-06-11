@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Card extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $appends = ['total_points'];
 
     /**
      * @var array<int, string>
@@ -39,11 +42,27 @@ class Card extends Model
     public static function generateCardNumber(): int
     {
         $lastCard = self::latest('id')->first();
-        return $lastCard ? $lastCard->card_number + 1 + 1000000000: 1000000000; // Starting from a base number
+        return $lastCard ? ((int) $lastCard->card_number) + 1 : 100001; // Starting from a base number
     }
 
     public function cardDetails()
     {
         return $this->hasMany(CardDetail::class)->with('fixture');
     }
+
+
+    public function total_points(): int
+    {
+        return Attribute::make(
+            get: function () {
+                return $this->cardDetails->sum('points');
+            }
+        );
+    }
+    public function getTotalPointsAttribute(): int
+    {
+        return $this->cardDetails->sum('points');
+    }
+
+
 }

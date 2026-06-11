@@ -61,6 +61,6 @@ class User extends Authenticatable
 
     public function cards()
     {
-        return $this->hasMany(Card::class)->with('cardDetails');
+        return $this->hasMany(Card::class)->with('cardDetails',);
     }
 }
