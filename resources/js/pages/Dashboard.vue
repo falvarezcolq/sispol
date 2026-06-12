@@ -198,8 +198,8 @@ function countryFlagUrl(flag?: string | null) {
 <template>
     <Head title="Detalles del usuario" />
 
-
-        <div v-if="user" class="relative flex h-full flex-1 flex-col overflow-hidden rounded-3xl bg-slate-950 p-4 text-white shadow-2xl md:p-6">
+    <div class="container mx-auto">
+<div v-if="user" class="relative flex h-full flex-1 flex-col overflow-hidden rounded-3xl bg-slate-950 p-4 text-white shadow-2xl md:p-6">
             <div class="pointer-events-none absolute inset-0 overflow-hidden">
                 <div class="absolute -left-20 top-0 h-64 w-64 rounded-full bg-cyan-500/15 blur-3xl"></div>
                 <div class="absolute right-0 top-16 h-72 w-72 rounded-full bg-fuchsia-500/10 blur-3xl"></div>
@@ -558,5 +558,8 @@ function countryFlagUrl(flag?: string | null) {
                 </section>
             </div>
         </div>
+
+    </div>
+        
 
 </template>
