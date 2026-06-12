@@ -102,18 +102,18 @@ import { login } from '@/routes';
     </div>
 </section>
 
-<!-- Pozo Acumulado -->
-<section class="space-y-4">
-    <header>
-        <span class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Pozo</span>
-        <h3 class="mt-2 text-2xl font-black text-white">Pozo acumulado</h3>
-    </header>
+                <!-- Pozo Acumulado -->
+                <section class="space-y-4">
+                    <header>
+                        <span class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Pozo</span>
+                        <h3 class="mt-2 text-2xl font-black text-white">Pozo acumulado</h3>
+                    </header>
 
-    <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-emerald-500/10 p-5 text-center">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.25em] text-emerald-400">Total acumulado</p>
-        <p class="mt-2 text-4xl font-black text-white">Bs. 30,000</p>
-    </div>
-</section>
+                    <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-emerald-500/10 p-5 text-center">
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.25em] text-emerald-400">Total acumulado</p>
+                        <p class="mt-2 text-4xl font-black text-white">Bs. 1,500</p>
+                    </div>
+                </section>
                               
 
                               
