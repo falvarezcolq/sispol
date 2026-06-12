@@ -241,11 +241,6 @@ function countryFlagUrl(flag?: string | null) {
             <div class="relative z-10 space-y-6">
                 <section class="overflow-hidden rounded-3xl border border-white/10 bg-white/10 p-5 shadow-xl backdrop-blur md:p-6">
 
-                     <div class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 dark:border-slate-700 dark:bg-slate-800">
-                        <Clock :size="14" class="text-blue-500 dark:text-blue-400" />
-                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Servidor:</span>
-                        <span class="font-mono text-sm font-semibold tabular-nums text-slate-700 dark:text-slate-200">{{ currentTime }}</span>
-                    </div>
                     <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                         <div class="flex items-center gap-4">
                             <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 text-xl font-black text-white shadow-lg shadow-cyan-500/20 ring-1 ring-white/20">
@@ -292,6 +287,13 @@ function countryFlagUrl(flag?: string | null) {
                             <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Estado</p>
                             <p class="mt-2 text-lg font-semibold text-white"></p>
                         </div> -->
+                    </div>
+
+                    
+                     <div class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 my-2 px-3 py-1.5 dark:border-slate-700 dark:bg-slate-800">
+                        <Clock :size="14" class="text-blue-500 dark:text-blue-400" />
+                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400"></span>
+                        <span class="font-mono text-sm font-semibold tabular-nums text-slate-700 dark:text-slate-200">{{ currentTime }}</span>
                     </div>
                 </section>
                 
