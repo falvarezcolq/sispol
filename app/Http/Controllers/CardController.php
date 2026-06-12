@@ -138,6 +138,9 @@ class CardController extends Controller
 
     public function saveCardDetailResult(Request $request)
     {
+
+        $user = auth()->user();
+
         $validated = $request->validate([
             'id' => 'required|exists:card_details,id',
             'gol_1' => 'required|integer|min:0',
@@ -145,6 +148,27 @@ class CardController extends Controller
         ]);
 
         $cardDetail = CardDetail::findOrFail($validated['id']);
+
+        $card = $cardDetail->card()->first();
+
+        if ($card->user_id !== $user->id) {
+            if (! $user->is_admin) {    
+                return response()->json(['message' => 'No autorizado.'], 403);
+            }
+        }
+
+        if( $cardDetail->fixture->played) {
+            return response()->json(['message' => 'No se pueden modificar resultados de partidos ya jugados.'], 400);
+        }
+
+        $time = new \DateTime();
+        $match_time = new \DateTime($cardDetail->fixture->match_date);
+        
+        if($time > $match_time) {
+            return response()->json(['message' => 'No se pueden modificar resultados de partidos que estan siendo jugados.'], 400);
+        }
+      
+
         $cardDetail->update([
             'gol_1' => $validated['gol_1'],
             'gol_2' => $validated['gol_2'],
