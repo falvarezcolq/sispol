@@ -42,7 +42,7 @@ class Card extends Model
     public static function generateCardNumber(): int
     {
         $lastCard = self::latest('id')->first();
-        return $lastCard ? ((int) $lastCard->card_number) + 1 : 100001; // Starting from a base number
+        return $lastCard ? ((int) $lastCard->card_number) + 1 : 100234; // Starting from a base number
     }
 
     public function cardDetails()
