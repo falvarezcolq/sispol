@@ -5,7 +5,7 @@ import { type BreadcrumbItem } from '@/types';
 import { saveCardDetailResult } from '@/services/AppService';
 import { Check } from '@lucide/vue';
 import { LayoutDashboard, UserRound, BriefcaseBusiness, FilesIcon } from '@lucide/vue';
-import { ref ,onMounted,} from 'vue';
+import { ref ,onMounted, onBeforeUnmount} from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -51,7 +51,39 @@ const props = defineProps<{
                 message?: string;
         }>;
     }>;
+    serverTime: string;
 }>();
+
+const currentTime = ref(props.serverTime);
+let clockInterval: ReturnType<typeof setInterval> | null = null;
+
+function parseServerTime(str: string): Date {
+    const [datePart, timePart] = str.split(' ');
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hours, minutes, seconds] = timePart.split(':').map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+}
+
+function formatTime(date: Date): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${pad(date.getDate())} de ${['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][date.getMonth()]} de ${date.getFullYear()}, ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+
+onMounted(() => {
+    const serverDate = parseServerTime(props.serverTime);
+    clockInterval = setInterval(() => {
+        serverDate.setSeconds(serverDate.getSeconds() + 1);
+        currentTime.value = formatTime(serverDate);
+    }, 1000);
+});
+
+
+onBeforeUnmount(() => {
+    if (clockInterval) {
+        clearInterval(clockInterval);
+    }
+});
 
 const totalCards = computed(() => props.cards.length);
 const totalDetails = computed(() => props.cards.reduce((sum, card) => sum + card.card_details.length, 0));
@@ -208,6 +240,12 @@ function countryFlagUrl(flag?: string | null) {
 
             <div class="relative z-10 space-y-6">
                 <section class="overflow-hidden rounded-3xl border border-white/10 bg-white/10 p-5 shadow-xl backdrop-blur md:p-6">
+
+                     <div class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 dark:border-slate-700 dark:bg-slate-800">
+                        <Clock :size="14" class="text-blue-500 dark:text-blue-400" />
+                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Servidor:</span>
+                        <span class="font-mono text-sm font-semibold tabular-nums text-slate-700 dark:text-slate-200">{{ currentTime }}</span>
+                    </div>
                     <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                         <div class="flex items-center gap-4">
                             <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 text-xl font-black text-white shadow-lg shadow-cyan-500/20 ring-1 ring-white/20">

@@ -14,6 +14,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'user' => $user,
             'cards' => $user->cards()->orderByDesc('id')->get(),
+            'serverTime' => now()->format('d/m/Y H:i:s'),
         ]);
     }
 }
