@@ -155,7 +155,7 @@ class CountrySeeder extends Seeder
 
         DB::table('fixtures')->insert([
             // Group A
-            ['country_id_1' => 1, 'country_id_2' => 2, 'group_id' => 1, 'match_date' => '2026-06-11 20:00:00'],  // Mexico vs South Korea
+            ['country_id_1' => 1, 'country_id_2' => 4, 'group_id' => 1, 'match_date' => '2026-06-11 20:00:00'],  // Mexico vs Sudafrica
             ['country_id_1' => 2, 'country_id_2' => 3, 'group_id' => 1, 'match_date' => '2026-06-11 20:00:00'],  // South Korea vs Czech Republic
             ['country_id_1' => 1, 'country_id_2' => 3, 'group_id' => 1, 'match_date' => '2026-06-18 19:00:00'],  // Mexico vs Czech Republic
             ['country_id_1' => 2, 'country_id_2' => 1, 'group_id' => 1, 'match_date' => '2026-06-18 19:00:00'],  // South Korea vs Mexico
