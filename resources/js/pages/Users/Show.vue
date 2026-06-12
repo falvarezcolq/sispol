@@ -133,6 +133,20 @@ function resultadoText(detail: CardDetail): string {
         return detail.fixture.gol_1 + ' - ' + detail.fixture.gol_2 + ' Empate';
     }
 }
+
+function countryFlagUrl(flag?: string | null) {
+    if (!flag) {
+        return '';
+    }
+
+    const codepoints = Array.from(flag)
+        .map((char) => char.codePointAt(0)?.toString(16))
+        .filter((value): value is string => Boolean(value))
+        .join('-');
+
+    return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${codepoints}.svg`;
+}
+
 </script>
 
 <template>
@@ -286,6 +300,44 @@ function resultadoText(detail: CardDetail): string {
                                                 >
                                                     <div class="flex items-start justify-between gap-0">
                                                         <div>
+
+                                                                                                                        <div class="grid grid-cols-[minmax(9rem,1fr)_auto_minmax(9rem,1fr)] items-center gap-2 text-sm font-semibold text-white">
+                                                                <span class="inline-flex min-w-0 items-center justify-end gap-2 justify-self-end text-right">
+                                                                    <img
+                                                                        v-if="detail.fixture.team1.flag"
+                                                                        :src="countryFlagUrl(detail.fixture.team1.flag)"
+                                                                        :alt="`Bandera de ${detail.fixture.team1.name}`"
+                                                                        class="h-4 w-6 shrink-0 rounded-sm object-cover"
+                                                                        loading="lazy"
+                                                                    >
+                                                                    <span class="truncate">{{ detail.fixture.team1.name }}</span>
+                                                                </span>
+                                                                <span class="inline-flex items-center">
+                                                                    <input
+                                                                        type="text"
+                                                                        v-model="detail.gol_1"
+                                                                        class="w-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs text-center text-slate-400 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                                                                    >
+                                                                    <span class="mx-2 text-xs font-bold text-slate-400">vs</span>
+                                                                    <input
+                                                                        type="text"
+                                                                        v-model="detail.gol_2"
+                                                                        class="w-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs text-center text-slate-400 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                                                                    >
+                                                                </span>
+                                                                <span class="inline-flex min-w-0 items-center gap-2 text-left">
+                                                                   
+                                                                    <span class="truncate">{{ detail.fixture.team2.name }}</span>
+
+                                                                     <img
+                                                                        v-if="detail.fixture.team2.flag"
+                                                                        :src="countryFlagUrl(detail.fixture.team2.flag)"
+                                                                        :alt="`Bandera de ${detail.fixture.team2.name}`"
+                                                                        class="h-4 w-6 shrink-0 rounded-sm object-cover"
+                                                                        loading="lazy"
+                                                                    >
+                                                                </span>
+                                                            </div>
                                                             <div class="grid grid-cols-[minmax(9rem,1fr)_auto_minmax(9rem,1fr)] items-center gap-2 text-sm font-semibold text-white">
                                                                 <span class="justify-self-end truncate text-right">{{ detail.fixture.team1.name }}</span>
                                                                 <span class="inline-flex items-center">

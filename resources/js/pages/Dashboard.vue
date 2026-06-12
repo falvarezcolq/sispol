@@ -4,6 +4,8 @@ import { Head, Link } from '@inertiajs/vue3';
 import { type BreadcrumbItem } from '@/types';
 import { saveCardDetailResult } from '@/services/AppService';
 import { Check } from '@lucide/vue';
+import { LayoutDashboard, UserRound, BriefcaseBusiness, FilesIcon } from '@lucide/vue';
+import { ref ,onMounted,} from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -51,13 +53,16 @@ const props = defineProps<{
 const totalCards = computed(() => props.cards.length);
 const totalDetails = computed(() => props.cards.reduce((sum, card) => sum + card.card_details.length, 0));
 const userInitials = computed(() =>
-    props.user.name
+    props.user?.name
         .split(' ')
         .filter(Boolean)
         .slice(0, 2)
         .map((part) => part[0]?.toUpperCase() ?? '')
         .join(''),
 );
+
+console.log('User:', props.user);
+console.log('Cards:', props.cards);
 
 type CardDetail = {
     id: number;
@@ -134,8 +139,7 @@ function resultadoText(detail: CardDetail): string {
     }
 }
 
-import { LayoutDashboard, UserRound, BriefcaseBusiness, FilesIcon } from '@lucide/vue';
-import { ref ,onMounted,} from 'vue';
+
 
 type SectionId = 'resumen' | 'personal' | 'operativo' | 'reportes';
 const activeSection = ref<SectionId>('resumen');
@@ -160,13 +164,27 @@ onMounted(() => {
     }
 });
 
+
+function countryFlagUrl(flag?: string | null) {
+    if (!flag) {
+        return '';
+    }
+
+    const codepoints = Array.from(flag)
+        .map((char) => char.codePointAt(0)?.toString(16))
+        .filter((value): value is string => Boolean(value))
+        .join('-');
+
+    return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${codepoints}.svg`;
+}
+
 </script>
 
 <template>
     <Head title="Detalles del usuario" />
 
 
-        <div class="relative flex h-full flex-1 flex-col overflow-hidden rounded-3xl bg-slate-950 p-4 text-white shadow-2xl md:p-6">
+        <div v-if="user" class="relative flex h-full flex-1 flex-col overflow-hidden rounded-3xl bg-slate-950 p-4 text-white shadow-2xl md:p-6">
             <div class="pointer-events-none absolute inset-0 overflow-hidden">
                 <div class="absolute -left-20 top-0 h-64 w-64 rounded-full bg-cyan-500/15 blur-3xl"></div>
                 <div class="absolute right-0 top-16 h-72 w-72 rounded-full bg-fuchsia-500/10 blur-3xl"></div>
@@ -331,10 +349,19 @@ onMounted(() => {
                                                     :key="detail.id"
                                                     class="rounded-2xl border border-white/10 bg-slate-950/60 p-4 transition hover:border-cyan-400/30 hover:bg-slate-950"
                                                 >
-                                                    <div class="flex items-start justify-between gap-0">
+                                                    <div class="">
                                                         <div>
-                                                            <div class="grid grid-cols-[minmax(9rem,1fr)_auto_minmax(9rem,1fr)] items-center gap-2 text-sm font-semibold text-white">
-                                                                <span class="justify-self-end truncate text-right">{{ detail.fixture.team1.name }}</span>
+                                                                                                            <div class="grid grid-cols-[minmax(9rem,1fr)_auto_minmax(9rem,1fr)] items-center gap-2 text-sm font-semibold text-white">
+                                                                <span class="inline-flex min-w-0 items-center justify-end gap-2 justify-self-end text-right">
+                                                                    <img
+                                                                        v-if="detail.fixture.team1.flag"
+                                                                        :src="countryFlagUrl(detail.fixture.team1.flag)"
+                                                                        :alt="`Bandera de ${detail.fixture.team1.name}`"
+                                                                        class="h-4 w-6 shrink-0 rounded-sm object-cover"
+                                                                        loading="lazy"
+                                                                    >
+                                                                    <span class="truncate">{{ detail.fixture.team1.name }}</span>
+                                                                </span>
                                                                 <span class="inline-flex items-center">
                                                                     <input
                                                                         type="text"
@@ -348,39 +375,59 @@ onMounted(() => {
                                                                         class="w-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs text-center text-slate-400 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                                                                     >
                                                                 </span>
-                                                                <span class="truncate text-left">{{ detail.fixture.team2.name }}</span>
-                                                            </div>
-                                                            <p class="mt-1 text-xs uppercase tracking-[0.28em] text-slate-400">
-                                                                #{{ date_hour_format(detail.fixture.match_date) }}, 
-                                                                {{ resultadoText(detail) }}
-                                                            </p>
-                                                            <p class="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-300">
-                                                                <span>{{ detail.fixture.group?.name }}</span>
-                                                                <span
-                                                                    class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold ring-1"
-                                                                    :class="{
-                                                                        'bg-emerald-400/15 text-emerald-300 ring-emerald-400/30': detail.points === 3,
-                                                                        'bg-amber-400/15 text-amber-300 ring-amber-400/30': detail.points === 1,
-                                                                        'bg-slate-400/10 text-slate-500 ring-slate-400/20': detail.points === 0,
-                                                                    }"
-                                                                >
-                                                                    {{ detail.points }} pts
+                                                                <span class="inline-flex min-w-0 items-center gap-2 text-left">
+                                                                   
+                                                                    <span class="truncate">{{ detail.fixture.team2.name }}</span>
+
+                                                                     <img
+                                                                        v-if="detail.fixture.team2.flag"
+                                                                        :src="countryFlagUrl(detail.fixture.team2.flag)"
+                                                                        :alt="`Bandera de ${detail.fixture.team2.name}`"
+                                                                        class="h-4 w-6 shrink-0 rounded-sm object-cover"
+                                                                        loading="lazy"
+                                                                    >
                                                                 </span>
-                                                            </p>
-                                                        </div>
+                                                            </div>
+                                                            <div>
+                                                                 <div class="flex items-left justify-start gap-2">
+                                                                    <p class="mt-1 text-xs uppercase tracking-[0.28em] text-slate-400">
+                                                                            #{{ date_hour_format(detail.fixture.match_date) }}, 
+                                                                            {{ resultadoText(detail) }}
+                                                                        </p>
+                                                                        <p class="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-300">
+                                                                            <span>{{ detail.fixture.group?.name }}</span>
+                                                                            <span
+                                                                                class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold ring-1"
+                                                                                :class="{
+                                                                                    'bg-emerald-400/15 text-emerald-300 ring-emerald-400/30': detail.points === 3,
+                                                                                    'bg-amber-400/15 text-amber-300 ring-amber-400/30': detail.points === 1,
+                                                                                    'bg-slate-400/10 text-slate-500 ring-slate-400/20': detail.points === 0,
+                                                                                }"
+                                                                            >
+                                                                                {{ detail.points }} pts
+                                                                            </span>
+                                                                        </p>
 
-                                                        <div class="flex items-left gap-0">
+                                                                </div>
+                                                              
+                                                            </div>
+                                                           
+                                                         
                                                             
-
-                                                            <button @click="saveResult(detail)" title="Guardar resultado" v-if="detail.updated_by === null" class="inline-flex items-center rounded-full border border-emerald-400/40 bg-transparent px-3 py-1 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-400/10" >
-                                                                <Check class="mr-1 h-3.5 w-3.5" /> guardar
-                                                            </button>
-
-                                                            <button @click="saveResult(detail)" title="Actualizar resultado" v-else class="inline-flex items-center rounded-full border border-amber-400/40 bg-transparent px-3 py-1 text-xs font-semibold text-amber-200 transition hover:bg-amber-400/10">
-                                                                <Check class="h-3.5 w-3.5" />
-                                                            </button>
                                                             
                                                         </div>
+                                                            <div class="flex items-center justify-end gap-2">
+                                                            
+                                                                <button @click="saveResult(detail)" title="Guardar resultado" v-if="detail.updated_by === null" class="inline-flex items-center rounded-full border border-emerald-400/40 bg-transparent px-3 py-1 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-400/10" >
+                                                                    <Check class="mr-1 h-3.5 w-3.5" /> guardar
+                                                                </button>
+
+                                                                <button @click="saveResult(detail)" title="Actualizar resultado" v-else class="inline-flex items-center rounded-full border border-amber-400/40 bg-transparent px-3 py-1 text-xs font-semibold text-amber-200 transition hover:bg-amber-400/10">
+                                                                    <Check class="h-3.5 w-3.5" />
+                                                                </button>
+                                                                
+                                                            </div>
+                                                      
                                                     </div>
                                                 </div>
                                             </div>
