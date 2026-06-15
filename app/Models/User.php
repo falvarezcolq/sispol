@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Attribute;
 
 /**
  * @property int $id
@@ -39,6 +40,8 @@ class User extends Authenticatable
      * @return array<string, string>
      */
 
+
+    protected $appends = ['total_cards'];
     protected $fillable = [
         'name',
         'email',
@@ -49,6 +52,7 @@ class User extends Authenticatable
         'updated_by',
         'deleted_by',
     ];
+
 
 
     protected function casts(): array
@@ -63,4 +67,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(Card::class)->with('cardDetails',);
     }
+
+    // public function cardsCount()
+    // {
+    //     return $this->hasMany(Card::class)->count();
+    // }
+
+
+    
+    public function getTotalCardsAttribute(): int
+    {
+         return $this->cards->count();
+    }
+
+
 }

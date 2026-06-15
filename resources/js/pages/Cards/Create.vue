@@ -16,10 +16,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const props = defineProps<{
     users: Array<{ id: number; name: string }>;
+    user_id: number | '';
 }>();
 
 const form = useForm({
-    user_id: '' as number | '',
+    user_id: props.user_id || '' as number ,
     card_number: '' as number | '',
     balance: '' as number | '',
     card_type: 'VIP',

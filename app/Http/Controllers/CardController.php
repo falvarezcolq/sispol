@@ -19,6 +19,7 @@ class CardController extends Controller
     {
         $search = trim((string) $request->input('search', ''));
         $perPage = (int) $request->input('per_page', 10);
+        $user_id = (int) $request->input('user_id', 0);
 
         $cards = Card::query()
             ->with('user:id,name')
@@ -30,6 +31,9 @@ class CardController extends Controller
                             $userQuery->where('name', 'ilike', "%{$search}%");
                         });
                 });
+            })
+            ->when($user_id > 0, function ($query) use ($user_id) {
+                $query->where('user_id', $user_id);
             })
             ->orderByDesc('id')
             ->paginate($perPage)
@@ -44,12 +48,14 @@ class CardController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
+        $user_id = (int) $request->input('user_id', 0);
         return Inertia::render('Cards/Create', [
             'users' => User::query()
                 ->orderBy('name')
                 ->get(['id', 'name']),
+            'user_id' => $user_id > 0 ? $user_id : null,
         ]);
     }
 

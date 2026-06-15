@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm, router } from '@inertiajs/vue3';
 import { onBeforeUnmount, ref, watch } from 'vue';
-import { Edit, Trash2, Plus, Search } from '@lucide/vue';
+import { Edit, Trash2, Plus, Search, PlusCircle } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
@@ -17,7 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const props = defineProps<{
     users: {
         data: Array<{
-            id: number;
+            id: number; 
             name: string;
             email: string;
             enabled: boolean;
@@ -29,6 +29,7 @@ const props = defineProps<{
         total: number;
         per_page: number;
         current_page: number;
+        total_cards:number;
     };
     search?: string | null;
 }>();
@@ -129,7 +130,7 @@ onBeforeUnmount(() => {
                         <th class="px-4 py-3 text-left text-xs font-bold tracking-wider">Email</th>
                         <th class="px-4 py-3 text-left text-xs font-bold tracking-wider">Estado</th>
                         <th class="px-4 py-3 text-left text-xs font-bold tracking-wider">Administrador</th>
-                        
+                        <th class="px-4 py-3 text-left text-xs font-bold tracking-wider">Tarjetas</th>
                         <th class="px-4 py-3 text-left text-xs font-bold tracking-wider">Acción</th>
                     </tr>
                 </thead>
@@ -168,7 +169,19 @@ onBeforeUnmount(() => {
                                 {{ item.is_admin ? 'Sí' : 'No' }}
                             </span>
                         </td>
+                        <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                            {{ item.total_cards ?? 0 }}
+                        </td>
                         <td class="px-4 py-3 text-sm space-x-2 flex items-center">
+
+                            <Link
+                                :href="`/cards/create?user_id=${item.id}`"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-blue-500 rounded hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+                                title="Agregar tarjeta"
+                            >
+                                <PlusCircle :size="16" />
+                            </Link>
+
                             <Link
                                 :href="`/users/${item.id}/edit`"
                                 class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-blue-500 rounded hover:bg-blue-700 transition-colors duration-200 shadow-sm"

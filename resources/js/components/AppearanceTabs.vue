@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { Monitor, Moon, Sun } from '@lucide/vue';
-import { useAppearance } from '@/composables/useAppearance';
 
-const { appearance, updateAppearance } = useAppearance();
 
 const tabs = [
     { value: 'light', Icon: Sun, label: 'Light' },
