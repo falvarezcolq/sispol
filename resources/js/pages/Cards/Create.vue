@@ -39,7 +39,7 @@ async function submit() {
 <template>
     <Head title="NUEVA TARJETA" />
 
-    <AppLayout :breadcrumbs="breadcrumbs">
+
         <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
             <div class="flex items-center justify-center gap-4 relative">
                 <Link
@@ -109,5 +109,5 @@ async function submit() {
                 </form>
             </div>
         </div>
-    </AppLayout>
+
 </template>

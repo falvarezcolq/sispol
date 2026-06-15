@@ -81,7 +81,7 @@ onBeforeUnmount(() => {
 <template>
     <Head title="GESTIÓN DE USUARIOS" />
 
-    <!-- <AppLayout :breadcrumbs="breadcrumbs"> -->
+
         <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
             <div class="flex justify-between items-center">
                 <Link
@@ -234,5 +234,5 @@ onBeforeUnmount(() => {
                 </div>
             </div>
         </div>
-    <!-- </AppLayout> -->
+
 </template>
