@@ -6,7 +6,8 @@ import { saveCardDetailResult } from '@/services/AppService';
 import { Check } from '@lucide/vue';
 import { LayoutDashboard, UserRound, BriefcaseBusiness, FilesIcon } from '@lucide/vue';
 import { ref ,onMounted, onBeforeUnmount} from 'vue';
-
+import ToastList from '@/components/ToastList.vue';
+import toastStore from '@/store/toast';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -160,18 +161,6 @@ function date_onlyformat(dateString: string) {
 function date_hour_format(dateString: string) {
     return new Date(dateString).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
-function saveResult(detail: CardDetail) {
-    
-    saveCardDetailResult(detail)
-        .then((response) => {
-            console.log('Resultado guardado exitosamente:', response);
-            detail.updated_by = 1; // Simulamos que el resultado ha sido actualizado por un usuario con ID 1
-        })
-        .catch((error) => {
-            console.error('Error al guardar el resultado:', error);
-            detail.message = error.message || 'Error al guardar el resultado';
-        });
-}
 
 function resultadoText(detail: CardDetail): string {
     if (detail.fixture.gol_1 === null || detail.fixture.gol_2 === null) {
@@ -205,11 +194,20 @@ const activeCardId = ref<number | null>(null);
 //     return props.cards.find(card => card.id === activeCardId.value) || null;
 // });
 
-onMounted(() => {
-    if (props.cards.length > 0) {
-        activeCardId.value = props.cards[0].id;
-    }
-});
+
+function additionalInfo() {
+    const cards  = props.cards;
+
+    cards.forEach(card => {
+        card.card_details.forEach(detail => {
+            detail.gol_1_update = detail.gol_1;
+            detail.gol_2_update = detail.gol_2;
+        });
+    });
+   
+}
+
+
 
 
 function countryFlagUrl(flag?: string | null) {
@@ -225,12 +223,52 @@ function countryFlagUrl(flag?: string | null) {
     return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${codepoints}.svg`;
 }
 
+
+
+
+import useToast from '@/store/toast';
+
+const toast  = useToast();
+
+onMounted(() => {
+    if (props.cards.length > 0) {
+        activeCardId.value = props.cards[0].id;
+    }
+    additionalInfo();
+
+});
+
+
+
+function saveResult(detail: CardDetail) {
+    
+    saveCardDetailResult(detail)
+        .then((response) => {
+            console.log('Resultado guardado exitosamente:', response);
+            detail.updated_by = 1; // Simulamos que el resultado ha sido actualizado por un usuario con ID 1
+            detail.gol_1_update = detail.gol_1;
+            detail.gol_2_update = detail.gol_2;
+            toast.addToast('Resultado guardado exitosamente','success');
+            
+        })
+        .catch((error) => {
+            console.error('Error al guardar el resultado:', error);
+            detail.message = error.message || 'Error al guardar el resultado';
+        });
+}
+
+
 </script>
 
 <template>
     <Head title="Detalles del usuario" />
+  
+    <div class="container mx-auto"> 
 
-    <div class="container mx-auto">
+    <ToastList/>
+      
+       
+
 <div v-if="user" class="relative flex h-full flex-1 flex-col overflow-hidden rounded-3xl bg-slate-950 p-4 text-white shadow-2xl md:p-6">
             <div class="pointer-events-none absolute inset-0 overflow-hidden">
                 <div class="absolute -left-20 top-0 h-64 w-64 rounded-full bg-cyan-500/15 blur-3xl"></div>
@@ -419,14 +457,14 @@ function countryFlagUrl(flag?: string | null) {
                                                                     <input
                                                                         type="text"
                                                                         v-model="detail.gol_1"
-                                                                        class="w-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs text-center text-slate-400 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                                                                        class="w-8 rounded-md border border-input ring-[1px] bg-transparent px-2 py-1 text-xs text-center text-slate-400 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                                                                         :readonly="detail.fixture.played"
                                                                     >
                                                                     <span class="mx-2 text-xs font-bold text-slate-400">vs</span>
                                                                     <input
                                                                         type="text"
                                                                         v-model="detail.gol_2"
-                                                                        class="w-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs text-center text-slate-400 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                                                                        class="w-8 rounded-md border border-input ring-[1px] bg-transparent px-2 py-1 text-xs text-center text-slate-400 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                                                                         :readonly="detail.fixture.played"
                                                                     >
                                                                 </span>
@@ -487,6 +525,7 @@ function countryFlagUrl(flag?: string | null) {
 
                                                                 <button @click="saveResult(detail)" title="Actualizar resultado" v-else class="inline-flex items-center rounded-full border border-amber-400/40 bg-transparent px-3 py-1 text-xs font-semibold text-amber-200 transition hover:bg-amber-400/10">
                                                                     <Check class="h-3.5 w-3.5" />
+                                                                    <span class="ml-1" v-if="detail.gol_1!=detail.gol_1_update || detail.gol_2!=detail.gol_2_update">actualizar</span>
                                                                 </button>
                                                                 
                                                             </div>
@@ -566,7 +605,7 @@ function countryFlagUrl(flag?: string | null) {
                                     </section>
 
                                     <!-- Pozo Acumulado -->
-                                    <section class="space-y-4">
+                                    <!-- <section class="space-y-4">
                                         <header>
                                             <span class="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Pozo</span>
                                             <h3 class="mt-2 text-2xl font-black text-white">Pozo acumulado</h3>
@@ -576,7 +615,7 @@ function countryFlagUrl(flag?: string | null) {
                                             <p class="text-[11px] font-semibold uppercase tracking-[0.25em] text-emerald-400">Total acumulado</p>
                                             <p class="mt-2 text-4xl font-black text-white">Bs. 830</p>
                                         </div>
-                                    </section>
+                                    </section> -->
 
                                     <section class="space-y-4">
                                         <header>
@@ -586,7 +625,6 @@ function countryFlagUrl(flag?: string | null) {
 
                                         <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-emerald-500/10 p-5 text-center">
                                             <p class="text-[11px] font-semibold uppercase tracking-[0.25em] text-blue-400">Solicita tu tarjeta VIP, que te permitira ser parte del pozo acumulado.</p>
-                                        
                                         </div>
                                     </section>
                               

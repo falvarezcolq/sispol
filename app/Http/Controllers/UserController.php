@@ -74,6 +74,7 @@ class UserController extends Controller
         return Inertia::render('Users/Show', [
             'user' => $user,
             'cards' => $user->cards()->orderByDesc('id')->get(),
+            'serverTime' => now()->format('d/m/Y H:i:s'),
         ]);
     }
 
