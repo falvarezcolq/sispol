@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Country;
 use App\Models\Fixture;
 use App\Models\Group;
+use App\Models\Card;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
 
 class FixtureController extends Controller
 {
@@ -59,13 +62,27 @@ class FixtureController extends Controller
             'match_date' => 'required|date_format:Y-m-d H:i',
         ]);
 
-        Fixture::create([
-            'country_id_1' => $request->country_id_1,
-            'country_id_2' => $request->country_id_2,
-            'group_id' => $request->group_id,
-            'match_date' => $request->match_date,
-            'created_by' => auth()->id(),
-        ]);
+
+        DB::transaction(function () use ($request) {
+            $fixture = Fixture::create([
+                'country_id_1' => $request->country_id_1,
+                'country_id_2' => $request->country_id_2,
+                'group_id' => $request->group_id,
+                'match_date' => $request->match_date,
+                'created_by' => auth()->id(),
+            ]);
+
+            // Add to cards
+            $cards = Card::get();
+            foreach ($cards as $card) {
+                $card->cardDetails()->create([
+                    'fixture_id' => $fixture->id,
+                    'created_by' => auth()->id(),
+                ]);
+            }
+        });
+     
+
 
         return redirect()->route('fixtures.index')->with('success', 'Partido creado exitosamente.');
     }
