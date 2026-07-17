@@ -16,12 +16,14 @@ class GroupSeeder extends Seeder
         //
 
           DB::table('groups')->insert([
-            ['name' => 'Eliminatorias 32'],
-            ['name' => 'Eliminatorias 16'],
-            ['name' => 'Eliminatorias 8'],
-            ['name' => 'Cuartos de Final'],
-            ['name' => 'Semifinal'],
-            ['name' => 'Final'],
+            // ['name' => 'Eliminatorias 32'],
+            // ['name' => 'Eliminatorias 16'],
+            // ['name' => 'Eliminatorias 8'],
+            // ['name' => 'Cuartos de Final'],
+            // ['name' => 'Semifinal'],
+            // ['name' => 'Final'],
+            ['name' => 'Tercer Lugar'],
+            
         ]);
     }
 }
